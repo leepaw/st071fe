@@ -1,7 +1,7 @@
 {
   "name": "st071fe_schedule",
   "version": "1.0.0",
-  "description": "This is a website for Ristorante Con Fusion",
+  "description": "Schedule web app",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Export a Table to PDF Template | PrepBootstrap</title>
+    <title>Front End Schedule</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
@@ -153,13 +153,21 @@
 
 
                     for (let j=0; j<all_events.length; j++) {
-                        if (curr_datetime < datetime_idx[j]) {  
-                            all_events.splice(j, 0, new_event);
-                            datetime_idx.splice(j, 0, curr_datetime);
-                            break;
-                        }
+          
                         // situations when event times are identical
                         if (curr_datetime == datetime_idx[j]) {
+
+                            // the "Go Home" for any cashier should take order
+                            // precedence over a "lunch" or "break" in
+                            // all_events with the same time
+                            // 
+                            if (new_event[1]=="Home" &&
+                                      (all_events[j][1]=="Break" ||
+                                       all_events[j][1]=="Lunch")) {
+                                all_events.splice(j, 0, new_event);
+                                datetime_idx.splice(j, 0, curr_datetime);
+                                break;
+                                       }
                         
                             // the "Go Home" event for a minor should
                             // take order precedence over any 'Go Home' in
@@ -173,18 +181,12 @@
                                 datetime_idx.splice(j, 0, curr_datetime);
                                 break;
                                     }
+                        }
 
-                            // the "Go Home" for any cashier should take order
-                            // precedence over a "lunch" or "break" in
-                            // all_events with the same time
-                            // 
-                            if (new_event[1]=="Home" &&
-                                      (all_events[j][1]=="Break" ||
-                                       all_events[j][1]=="Lunch")) {
-                                all_events.splice(j, 0, new_event);
-                                datetime_idx.splice(j, 0, curr_datetime);
-                                break;
-                                       }
+                        if (curr_datetime < datetime_idx[j]) {  
+                            all_events.splice(j, 0, new_event);
+                            datetime_idx.splice(j, 0, curr_datetime);
+                            break;
                         }
                     } 
 
