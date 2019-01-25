@@ -125,6 +125,9 @@
                             cashier_endtime === undefined) {
                     break;
                 }
+                if (cashier_assignment === undefined) {
+                    cashier_assignment = "";
+                }
 
                 arr = [];
                 arr.push(cashier_starttime);
@@ -155,11 +158,11 @@
                     for (let j=0; j<all_events.length; j++) {
           
                         // situations when event times are identical
-                        if (curr_datetime == datetime_idx[j]) {
-
-                            // the "Go Home" for any cashier should take order
-                            // precedence over a "lunch" or "break" in
-                            // all_events with the same time
+                        if (curr_datetime.getTime() == datetime_idx[j].getTime()) {
+                       
+                            // the "Go Home" for any cashier should take
+                            // precedence over a "lunch" or "break" in the main
+                            // list (all_events) with the same time
                             // 
                             if (new_event[1]=="Home" &&
                                       (all_events[j][1]=="Break" ||
@@ -169,9 +172,9 @@
                                 break;
                                        }
                         
-                            // the "Go Home" event for a minor should
-                            // take order precedence over any 'Go Home' in
-                            // all_events with the same time
+                            // the "Go Home" for a minor should
+                            // take precedence over any 'Go Home' in the
+                            // list (all_events) with the same time
                             //
                             if ((new_event[1]=="Home" && 
                                             (contains(new_event[2], '$')
@@ -183,13 +186,14 @@
                                     }
                         }
 
-                        if (curr_datetime < datetime_idx[j]) {  
+                        if (curr_datetime.getTime() < datetime_idx[j].getTime()) {
                             all_events.splice(j, 0, new_event);
                             datetime_idx.splice(j, 0, curr_datetime);
                             break;
                         }
                     } 
 
+                    // Insert at the end of main list (all_events)
                     if (previous_length == all_events.length) {
                         all_events.push(new_event);
                         datetime_idx.push(curr_cashier_events.datetime[i]);
