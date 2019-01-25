@@ -149,13 +149,42 @@
                     new_event.push(curr_cashier_events.assignment);
 
                     var previous_length = all_events.length;
-                    var dt = curr_cashier_events.datetime[i];
+                    var curr_datetime = curr_cashier_events.datetime[i];
+
 
                     for (let j=0; j<all_events.length; j++) {
-                        if (dt.getTime() <= datetime_idx[j].getTime()) {  
+                        if (curr_datetime < datetime_idx[j]) {  
                             all_events.splice(j, 0, new_event);
-                            datetime_idx.splice(j, 0, dt);
+                            datetime_idx.splice(j, 0, curr_datetime);
                             break;
+                        }
+                        // situations when event times are identical
+                        if (curr_datetime == datetime_idx[j]) {
+                        
+                            // the "Go Home" event for a minor should
+                            // take order precedence over any 'Go Home' in
+                            // all_events with the same time
+                            //
+                            if ((new_event[1]=="Home" && 
+                                            (contains(new_event[2], '$')
+                                            || contains(new_event[2], '#'))) &&
+                                                all_events[j][1]=="Home") {
+                                all_events.splice(j, 0, new_event);
+                                datetime_idx.splice(j, 0, curr_datetime);
+                                break;
+                                    }
+
+                            // the "Go Home" for any cashier should take order
+                            // precedence over a "lunch" or "break" in
+                            // all_events with the same time
+                            // 
+                            if (new_event[1]=="Home" &&
+                                      (all_events[j][1]=="Break" ||
+                                       all_events[j][1]=="Lunch")) {
+                                all_events.splice(j, 0, new_event);
+                                datetime_idx.splice(j, 0, curr_datetime);
+                                break;
+                                       }
                         }
                     } 
 
@@ -169,7 +198,7 @@
 
             displayHTMLTable(all_events);
     
-        }
+        } 
 
         //  input: an array of strings that includes start time (input[0]) 
         //  and stop time (input[1]), in military format, and
@@ -489,6 +518,10 @@
             return str.substr(0,index) + chr + str.substr(index+1);
         }
 
+        function contains(input, ch) {
+            return (input.indexOf(ch) >= 0);    
+        }
+
         
         function displayHTMLTable(results){
             var table = '<table id="exportTable" class="table table-condensed table-hover table-striped">';
@@ -499,6 +532,10 @@
                 table+= "<tr>";
                 var row = data[i];
                 var cells = row.join(",").split(",");
+
+                //if (cells[1] == "Home") {
+                    //table+= "<tr style='font-weight:bold'>";
+                //}
                 
                 for(j=0;j<cells.length;j++){
                     table+= "<td>";
