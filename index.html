@@ -52,9 +52,10 @@
         </form>
         <br>
 
-        <button id="exportButton" class="btn btn-lg btn-space btn-danger clearfix">
+        <button id="exportButton" class="btn btn-lg btn2-space btn-danger clearfix">
             <span class="fa fa-file-pdf-o"></span> Export to PDF
         </button>
+        <span id="span-id"></span>
         <br>
         <br>
         <div id="header"></div>
@@ -203,6 +204,8 @@
             } //for each cashier
 
             displayHTMLTable(all_events);
+            var text_ = all_events.length + " scheduled events"
+            document.getElementById("span-id").innerHTML = text_;
     
         } 
 
