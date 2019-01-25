@@ -162,8 +162,8 @@
                         if (curr_datetime.getTime() == datetime_idx[j].getTime()) {
                        
                             // the "Go Home" for any cashier should take
-                            // precedence over a "lunch" or "break" in the main
-                            // list (all_events) with the same time
+                            // precedence over a "lunch" or "break" with 
+                            // the same time
                             // 
                             if (new_event[1]=="Home" &&
                                       (all_events[j][1]=="Break" ||
@@ -174,8 +174,8 @@
                                        }
                         
                             // the "Go Home" for a minor should
-                            // take precedence over any 'Go Home' in the
-                            // list (all_events) with the same time
+                            // take precedence over any 'Go Home' with
+                            // the same time
                             //
                             if ((new_event[1]=="Home" && 
                                             (contains(new_event[2], '$')
