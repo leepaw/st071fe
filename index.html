@@ -194,7 +194,8 @@
                         }
                     } 
 
-                    // Insert at the end of main list (all_events)
+                    // the main array of all events hasn't been updated,
+                    // so this new event will be added to the end
                     if (previous_length == all_events.length) {
                         all_events.push(new_event);
                         datetime_idx.push(curr_cashier_events.datetime[i]);
@@ -527,6 +528,13 @@
             return str.substr(0,index) + chr + str.substr(index+1);
         }
 
+        //
+        // Checks whether a string contains a character;
+        // 'input' is what we want to check and 'ch' is the character
+        //  that we're searchig for
+        //
+        // Returns a boolean, true if 'ch' is found, false otherwise
+        //
         function contains(input, ch) {
             return (input.indexOf(ch) >= 0);    
         }
