@@ -1,7 +1,7 @@
 {
-  "name": "st071fe_schedule",
+  "name": "sort_emos",
   "version": "1.0.0",
-  "description": "Schedule web app",
+  "description": "Sort schedule web app",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -14,6 +14,8 @@
     "express": "^4.16.4",
     "jquery": "^3.3.1",
     "jspdf": "^1.5.3",
+    "moment": "^2.24.0",
+    "papaparse": "^4.6.3",
     "popper.js": "^1.12.9"
   }
 }

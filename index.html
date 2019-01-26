@@ -2,19 +2,17 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Front End Schedule</title>
+    <title>Sort Schedule</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.min.css" />
 
     <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
-    <!--
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.71/jquery.csv-0.71.min.js"></script>
-    -->
     <script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.6.3/papaparse.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.0/moment.js"></script>
+    <script type="text/javascript" src="node_modules/papaparse/papaparse.min.js"></script>
+    <script type="text/javascript" src="node_modules/moment/moment.js"></script>
+
     <style>
         .pdfobject-container { height: 500px;}
         .pdfobject { border: 1px solid #666; }
@@ -31,10 +29,10 @@
 <div class="container">
     <br>
     <div class="page-header">
-        <h1>ST071 FE Schedule</h1>
+        <h1>Sort Schedule</h1>
     </div>
     <br>
-    <!-- Export a Table to PDF - START -->
+
     <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="css/styles.css" />
 
@@ -42,7 +40,7 @@
         <form class="form-inline">
             <div class="form-group">
                 <button type="submit" id="submit-file" class="btn btn-lg btn-space clearfix" style="background:#3399ff;color:white">
-                    <span class="fa fa-cloud-upload"></span> Load File
+                    <span class="fa fa-upload"></span> Load File
                 </button>
             </div>
             <div class="form-group">
@@ -200,7 +198,7 @@
                         all_events.push(new_event);
                         datetime_idx.push(curr_cashier_events.datetime[i]);
                     }
-                } // for each events (i.e break/lunch/home) in a cashier's shift
+                } // for each event (i.e break/lunch/home) in a cashier's shift
 
             } //for each cashier
 
@@ -246,7 +244,7 @@
                 stop_datetime.setDate(stop_datetime.getDate() + 1);
             }
 
-            var total_hrs = getDiff2(input);
+            var total_hrs = getDiff(input);
 
             switch (total_hrs) {
                 case 8.5:
@@ -383,9 +381,9 @@
         //      var arr = [];
         //      arr.push("2000");
         //      arr.push("0:00");
-        //      alert(getDiff2(arr));
+        //      alert(getDiff(arr));
         //
-        function getDiff2(input) {
+        function getDiff(input) {
 
             // get the DateTime object for the start time
             var date1 = toDateTime(input[0]);
@@ -405,24 +403,6 @@
 
             var diff_result = diff_hh + diff_mm/60.0;
             return diff_result;
-        }
-
-        // input must be military time: input[0] is starttime 
-        // and input[1] is endtime
-        //
-        // returns a floating point number for total hours and minutes worked
-        //   (e.g. 7.5)
-        function getDiff(input) {
-            var startTime = moment(input[0], 'H:mm');
-            var endTime = moment(input[1], 'H:mm');
-
-            var hrs = endTime.diff(startTime, 'hours');
-            var mins = moment.utc(
-                   moment(endTime, 'H:mm').diff(
-                   moment(startTime, 'H:mm'))).format("mm");
-
-            var diffResult = parseFloat(hrs) + parseFloat(mins)/60;
-            return diffResult;
         }
 
         //
@@ -530,10 +510,11 @@
 
         //
         // Checks whether a string contains a character;
+        // 
         // 'input' is what we want to check and 'ch' is the character
         //  that we're searchig for
         //
-        // Returns a boolean, true if 'ch' is found, false otherwise
+        // Returns a boolean; true if 'ch' is found, false otherwise
         //
         function contains(input, ch) {
             return (input.indexOf(ch) >= 0);    
@@ -545,20 +526,40 @@
             //var data = results.data;
             var data = results;
             
-            for(i=0;i<data.length;i++){
+            for(let i=0;i<data.length;i++){
                 table+= "<tr>";
                 var row = data[i];
                 var cells = row.join(",").split(",");
 
-                //if (cells[1] == "Home") {
-                    //table+= "<tr style='font-weight:bold'>";
-                //}
-                
-                for(j=0;j<cells.length;j++){
-                    table+= "<td>";
-                    table+= cells[j];
-                    table+= "</td>";
+                /*if (cells[1] == "Home") {
+                    table+= "<tr style='font-weight:bold'>";
+                }*/
+
+                var curr_hour = cells[0].split(":")[0];
+                var next_hour;
+
+                if ((i+1) == data.length) {
+                    next_hour = curr_hour;
+                }else {
+                    next_hour = data[i+1].join(",").split(",")[0].split(":")[0];
                 }
+
+                // create borders that encapsulates events with the same hour
+                if (curr_hour != next_hour) {
+                    for(let j=0;j<cells.length;j++){
+                        table+= "<td style='border-bottom: solid 1px #DDD; border-collapse: collapse;'>";
+                        table+= cells[j];
+                        table+= "</td>";
+                    }   
+                }
+                else {
+                    for(let m=0;m<cells.length;m++){
+                        table+= "<td>";
+                        table+= cells[m];
+                        table+= "</td>";
+                    }
+                }
+                
                 table+= "</tr>";
             }
             table+= "</table>";
@@ -575,146 +576,27 @@
 
                 var style = "<style>";
                 style = style + "table {width: 100%;font: 17px Calibri;}";
-                style = style + "table, th, td {border: solid 1px #DDD; border-collapse: collapse;";
+                style = style + "table, th {border: solid 1px #DDD; border-collapse: collapse;";
                 style = style + "padding: 12px 10px;text-align: center;}";
+                style = style + "td {padding: 12px 10px;text-align: center;}";
                 style = style + "</style>";
 
-                // CREATE A WINDOW OBJECT.
+                // Create a window object
                 var win = window.open('', '', 'height=700,width=700');
                 win.document.write('<html><head>');
-                //win.document.write('<title>Schedule</title>');   // <title> FOR PDF HEADER.
-                win.document.write(style);          // ADD STYLE INSIDE THE HEAD TAG.
+                //win.document.write('<title>Schedule</title>');   // <title> for PDF header
+                win.document.write(style);          // Add style inside the head tag
                 win.document.write('</head>');
                 win.document.write('<body>');
-                win.document.write(sTable);         // THE TABLE CONTENTS INSIDE THE BODY TAG.
+                win.document.write(sTable);         // table contents inside the body tag
                 win.document.write('</body></html>');
 
-                win.document.close(); 	// CLOSE THE CURRENT WINDOW.
+                win.document.close(); 	// close the current window
 
-                win.print();    // PRINT THE CONTENTS.
+                win.print();    // print the contents
             });  
         });
     </script>
-
-<!-- you need to include the shieldui css and js assets in order for the components to work 
-<link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light/all.min.css" />
-<script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
-<script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/jszip.min.js"></script>
--->
-
-<!--
-<script type="text/javascript">
-    $('#submit-file').on("click",function(e){
-        e.preventDefault();
-        $(document).ready(function(){
-            var data;
-            var theFile = document.getElementById('files');
-            var fileName = theFile.value.split(/(\\|\/)/g).pop();
-        
-            $.ajax({
-                type: "GET",
-                //url: "SampleCSVFile.csv",
-                url: fileName,
-                dataType: "text",
-                success: function(response)
-                {
-                    data = $.csv.toArrays(response);
-                    generateHtmlTable(data);
-                }
-            });
-
-            function generateHtmlTable(data) {
-                var html = '<table class="table table-condensed table-hover table-striped">';
-            
-                if(typeof(data[0]) === 'undefined') {
-                    return null;
-                } else {
-                    $.each(data, function( index, row ) {
-                        //bind header
-                        if(index == 0) {
-                            html += '<thead>';
-                            html += '<tr>';
-                            $.each(row, function( index, colData ) {
-                                html += '<th>';
-                                html += colData;
-                                html += '</th>';
-                            });
-                            html += '</tr>';
-                            html += '</thead>';
-                            html += '<tbody>';
-                        } else {
-                            html += '<tr>';
-                            $.each(row, function( index, colData ) {
-                                html += '<td>';
-                                html += colData;
-                                html += '</td>';
-                            });
-                            html += '</tr>';
-                        }
-                    });
-                    html += '</tbody>';
-                    html += '</table>';
-
-                    $('#csv-display').append(html);
-                }
-            }
-        });
-    });
-</script>
--->
-
-<!--
-<script type="text/javascript">
-    jQuery(function ($) {
-        $("#exportButton").click(function () {
-            // parse the HTML table element having an id=exportTable
-            var dataSource = shield.DataSource.create({
-                data: "#exportTable",
-                schema: {
-                    type: "table",
-                    fields: {
-                        Name: { type: String },
-                        Age: { type: Number },
-                        Email: { type: String }
-                    }
-                }
-            });
-        
-
-            // when parsing is done, export the data to PDF
-            dataSource.read().then(function (data) {
-                var pdf = new shield.exp.PDFDocument({
-                    author: "PrepBootstrap",
-                    created: new Date()
-                });
-
-                pdf.addPage("a4", "portrait");
-
-                pdf.table(
-                    50,
-                    50,
-                    data,
-                    [
-                        { field: "Name", title: "First Name", width: 200 },
-                        { field: "Age", title: "Age", width: 50 },
-                        { field: "Email", title: "Email Address", width: 200 }
-                    ],
-                    {
-                        margins: {
-                            top: 50,
-                            left: 50
-                        }
-                    }
-                );
-
-                pdf.saveAs({
-                    fileName: "PrepPDF"
-                });
-            });
-        });
-    });
-</script>
--->
 
 </div>
 
